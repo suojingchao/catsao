@@ -5,6 +5,7 @@ import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+import 'lifestyle_entity.dart';
 import 'lifestyle_info.dart';
 import 'weather_info.dart';
 
@@ -24,7 +25,6 @@ class DrawerHomeState extends State<DrawerHome> {
   Map<String, double> _currentLocation;
   WeatherInfo _weatherInfo = null;
   LifestyleInfo _lifestyleInfo = null;
-
   _initLocation() async {
     _currentLocation = <String, double>{};
 
@@ -33,7 +33,7 @@ class DrawerHomeState extends State<DrawerHome> {
     try {
       _currentLocation = await location.getLocation;
       _getWeatherInfo();
-      //_getLifeStyle();
+      _getLifeStyle();
       print(_currentLocation);
     } on PlatformException {
       _currentLocation = null;
@@ -54,13 +54,14 @@ class DrawerHomeState extends State<DrawerHome> {
 
   }
 
-  /*_getLifeStyle() async {
+  _getLifeStyle() async {
     http.Response response = await http.get(_formatUrl(_lifeStyleUrl));
     setState(() {
-      _lifeStyleMap = JSON.decode(response.body);
+      _lifestyleInfo = new LifestyleInfo(response);
+      print('data.length=${_lifestyleInfo.data.length}');
     });
 
-  }*/
+  }
 
   @override
   void initState() {
@@ -68,8 +69,73 @@ class DrawerHomeState extends State<DrawerHome> {
     _initLocation();
   }
 
+  _generateLifestyleItem(LifestyleEntity item) {
+    return new Column(
+      children: <Widget>[
+        new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              new Text(
+                item.name,
+                style: new TextStyle(
+                    fontSize: 20.0
+                ),
+              ),
+              new Text(
+                _lifestyleInfo == null ? 'loading' : item.shortDes,
+                style: new TextStyle(
+                    fontSize: 24.0
+                ),
+              )
+            ]
+        )
+        /*new Row(
+          children: <Widget>[
+            new Text(
+              item.des,
+              style: new TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.grey
+              ),
+            )
+          ],
+        )*/
+      ],
+    );
+  }
+
+  _generateWeatherItem() {
+    return new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          new Column(
+            children: <Widget>[
+              new Text(
+                _weatherInfo == null ? 'loading' : _weatherInfo.location,
+                style: new TextStyle(
+                    fontSize: 24.0
+                ),
+              ),
+              new Text(
+                _weatherInfo == null ? 'loading' : _weatherInfo.tmp,
+                style: new TextStyle(
+                    fontSize: 28.0
+                ),
+              )
+            ],
+          ),
+          new SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: new Image.asset("assets/weather-sunny.png"),
+          ),
+        ]
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return new Drawer(
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -78,22 +144,18 @@ class DrawerHomeState extends State<DrawerHome> {
             new Image.asset("assets/flutter_bg.png"),
             new Container(
                 padding: const EdgeInsets.all(12.0),
-                child: new Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      new Column(
-                        children: <Widget>[
-                          new Text(_weatherInfo == null ? 'loading' : _weatherInfo.location),
-                          new Text(_weatherInfo == null ? 'loading' : _weatherInfo.tmp)
-                        ],
-                      ),
-                      new SizedBox(
-                        width: 60.0,
-                        height: 60.0,
-                        child: new Image.asset("assets/weather-sunny.png"),
-                      )
-                    ]
+                child: new Column(
+                  children: <Widget>[
+                    _generateWeatherItem(),
+                    new ListView.builder(
+                      itemCount: _lifestyleInfo == null ? 0 : _lifestyleInfo.data.length,
+                      itemBuilder: (BuildContext context, int position) {
+                        return _generateLifestyleItem(_lifestyleInfo.data[position]);
+                      }
+                    )
+                  ]
                 )
+
             )
           ],
         )
