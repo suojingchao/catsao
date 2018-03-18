@@ -1,6 +1,7 @@
 # Catsao
 ## Introduction
-之前一直在研究Flutter的理论知识。纸上谈兵终觉浅，绝知此事要躬行。于是catsao就诞生了。
+纸上谈兵终觉浅，绝知此事要躬行。
+
 catsao（音：cat骚），我撸的第一个Flutter Application Demo，目前阶段它主要仿造目前主流的新闻资讯类app布局，实现了简单的新闻浏览。我还要继续丰富它，让它越来越sao。
 
 ## Effect
