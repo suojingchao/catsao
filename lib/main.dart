@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'home/home.dart';
+import 'page/home_page.dart';
 
-void main() => runApp(new MyApp());
+void main() {
+  runApp(new App());
+  //debugDumpRenderTree();
+}
 
 
