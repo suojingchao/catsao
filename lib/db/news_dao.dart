@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:catsao/entity/news_item_entity.dart';
-import 'db_helper.dart';
+import 'package:catsao/db/db_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class NewsDao {
@@ -18,8 +18,8 @@ class NewsDao {
   static final String COLUMN_NAME_THUMBPIC2 = 'thumbpic2';
 
   final String CREATE_TABLE = '''
-              CREATE TABLE ${TABLE_NAME} (id INTEGER PRIMARY KEY, ${COLUMN_NAME_UNIQUEKEY} TEXT, 
-              ${COLUMN_NAME_TITLE} TEXT, ${COLUMN_NAME_DATE} TEXT, ${COLUMN_NAME_CATEGORY} TEXT,
+              CREATE TABLE ${TABLE_NAME} (${COLUMN_NAME_ID} INTEGER PRIMARY KEY, ${COLUMN_NAME_UNIQUEKEY} TEXT UNIQUE ON CONFLICT IGNORE, 
+              ${COLUMN_NAME_TITLE} TEXT, ${COLUMN_NAME_DATE} INTEGER, ${COLUMN_NAME_CATEGORY} TEXT,
               ${COLUMN_NAME_AUTHOR} TEXT, ${COLUMN_NAME_URL} TEXT, ${COLUMN_NAME_THUMBPIC0} TEXT,
               ${COLUMN_NAME_THUMBPIC1} TEXT, ${COLUMN_NAME_THUMBPIC2} TEXT);
               ''';
@@ -80,15 +80,15 @@ class NewsDao {
     return null;
   }
 
-  Future<List<NewsItemEntity>> getNewsByOffset(String type, int offset, int limit) async {
+  Future<List<NewsItemEntity>> getNewsByOffset(String type, int offset, int limit, {newsDate: 0}) async {
     if (db == null) {
       await new DBHelper().initDB();
       db = new DBHelper().db;
     }
     List<Map> maps = await db.query(
       TABLE_NAME,
-      where: '${COLUMN_NAME_CATEGORY}=?',
-      whereArgs: [type],
+      where: '${COLUMN_NAME_CATEGORY}=? and ${COLUMN_NAME_DATE}>?',
+      whereArgs: [type, newsDate],
       offset: offset,
       limit: limit
     );

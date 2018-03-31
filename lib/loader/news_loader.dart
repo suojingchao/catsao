@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'loader.dart';
-import '../entity/news_item_entity.dart';
-import '../util/sp_helper.dart';
-import '../db/news_dao.dart';
-import '../util/log_helper.dart';
+import 'package:catsao/entity/news_item_entity.dart';
+import 'package:catsao/util/sp_helper.dart';
+import 'package:catsao/db/news_dao.dart';
+import 'package:catsao/util/log_helper.dart';
 
 class NewsLoader extends Loader<NewsItemEntity> {
 
@@ -36,14 +36,43 @@ class NewsLoader extends Loader<NewsItemEntity> {
   }
 
   @override
-  Future<List<NewsItemEntity>> loadData() async {
+  Future<List<NewsItemEntity>> loadData({DataSource datasource: DataSource.DEFAULT, int offset, int limit}) async {
     if (data != null) {
       data.clear();
     } else {
       data = [];
     }
-    lastLoadTime = spHelper.getInt(spLoadTimeKey);
-    Log.i(TAG, 'news type ${tabName}, lastLoadTime=${lastLoadTime}');
+
+    if (datasource == DataSource.DEFAULT) {
+      await _loadDataFromDB(offset, limit);
+      try {
+        if (data == null) {
+          data = [];
+          await _loadDataFromNetwork();
+        }
+        lastLoadTime = spHelper.getInt(spLoadTimeKey);
+      } catch(ex) {
+        Log.i(TAG, ex.toString());
+        data = null;
+      }
+    } else if (datasource == DataSource.NETWORK) {
+      try {
+        await _loadDataFromNetwork();
+        lastLoadTime = spHelper.getInt(spLoadTimeKey);
+      } catch(ex) {
+        Log.i(TAG, ex.toString());
+        data = null;
+      }
+    } else if (datasource == DataSource.DATABASE) {
+      try {
+        await _loadDataFromDB(offset, limit);
+      } catch(ex) {
+        Log.i(TAG, ex.toString());
+        data = null;
+      }
+    }
+
+    /*Log.i(TAG, 'news type ${tabName}, lastLoadTime=${lastLoadTime}');
     try {
       if (lastLoadTime == null || new DateTime.now().millisecondsSinceEpoch - lastLoadTime > 1000 * 60 * 60) {
         await _loadDataFromNetwork();
@@ -53,7 +82,7 @@ class NewsLoader extends Loader<NewsItemEntity> {
     } catch(ex) {
       Log.i(TAG, ex.toString());
       data = null;
-    }
+    }*/
     return data;
   }
 
@@ -65,8 +94,8 @@ class NewsLoader extends Loader<NewsItemEntity> {
     return '${NEWS_URL}type=${type}&key=${JUHE_API_KEY}';
   }
 
-  _loadDataFromDB() async {
-    data = await new NewsDao().getNewsByOffset(tabName, 0, 30);
+  _loadDataFromDB(int offset, int limit) async {
+    data = await new NewsDao().getNewsByOffset(tabName, offset, limit);
   }
 
   _loadDataFromNetwork() async {
@@ -89,7 +118,7 @@ class NewsLoader extends Loader<NewsItemEntity> {
         data.add(new NewsItemEntity(
             uniquekey: item['uniquekey'],
             title: item['title'],
-            date: item['date'],
+            humanableDate: item['date'],
             category: item['category'],
             author: item['author_name'],
             url: item['url'],

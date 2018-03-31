@@ -1,20 +1,28 @@
-import '../db/news_dao.dart';
+import 'package:intl/intl.dart';
+import 'package:catsao/db/news_dao.dart';
 
 class NewsItemEntity {
+
+  static final TAG = 'NewsItemEnity';
+
   int id;
   String uniquekey;
   String title;
-  String date;
+  int date;
   String category;
   String author;
   String url;
   String thumbnail0;
   String thumbnail1;
   String thumbnail2;
+  String humanableDate;
 
 
-  NewsItemEntity({this.uniquekey, this.title, this.date, this.category,
-    this.author, this.url, this.thumbnail0, this.thumbnail1, this.thumbnail2});
+  NewsItemEntity({this.uniquekey, this.title, this.humanableDate, this.category,
+    this.author, this.url, this.thumbnail0, this.thumbnail1, this.thumbnail2}) {
+    DateTime datetime = DateTime.parse(humanableDate);
+    this.date = datetime.millisecondsSinceEpoch;
+  }
 
   toMap() {
     Map map = {NewsDao.COLUMN_NAME_UNIQUEKEY: uniquekey, NewsDao.COLUMN_NAME_TITLE: title,
@@ -36,7 +44,10 @@ class NewsItemEntity {
     thumbnail0 = map[NewsDao.COLUMN_NAME_THUMBPIC0];
     thumbnail1 = map[NewsDao.COLUMN_NAME_THUMBPIC1];
     thumbnail2 = map[NewsDao.COLUMN_NAME_THUMBPIC2];
+    var formatter = new DateFormat('yyyy-MM-dd HH:mm');
+    humanableDate = formatter.format(new DateTime.fromMillisecondsSinceEpoch(date));
 
   }
+
 
 }

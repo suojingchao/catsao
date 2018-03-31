@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:catsao/page/drawer_page.dart';
-import 'news_page.dart';
-import '../util/stirngs_helper.dart';
+import 'package:catsao/ui/drawer_page.dart';
+import 'package:catsao/ui/news_page.dart';
+import 'package:catsao/util/stirngs_helper.dart';
 
 /**
  * home page of application.

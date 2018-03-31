@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../util/sp_helper.dart';
-import '../loader/weather_loader.dart';
-import '../util/log_helper.dart';
+import 'package:catsao/util/sp_helper.dart';
+import 'package:catsao/loader/weather_loader.dart';
+import 'package:catsao/util/log_helper.dart';
 
 import 'package:catsao/entity/weather_entity.dart';
 
@@ -25,7 +25,7 @@ class _DrawerPageState extends State<DrawerPage> {
 
   _initData() async {
     await loader.init();
-    _weatherInfo = await loader.loadData();
+    _weatherInfo = await loader.loadData(offset: 0, limit: 0);
     Log.i(TAG, _weatherInfo.toString());
     setState(() {});
   }

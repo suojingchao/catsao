@@ -5,10 +5,10 @@ import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
-import 'loader.dart';
-import '../entity/weather_entity.dart';
-import '../util/sp_helper.dart';
-import '../util/log_helper.dart';
+import 'package:catsao/loader/loader.dart';
+import 'package:catsao/entity/weather_entity.dart';
+import 'package:catsao/util/sp_helper.dart';
+import 'package:catsao/util/log_helper.dart';
 
 class WeatherLoader extends Loader<WeatherEntity> {
 
@@ -33,7 +33,7 @@ class WeatherLoader extends Loader<WeatherEntity> {
   }
 
   @override
-  Future<List<WeatherEntity>> loadData() async {
+  Future<List<WeatherEntity>> loadData({DataSource datasource: DataSource.DEFAULT, int offset, int limit}) async {
     if (data != null) {
       data.clear();
     } else {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../util/stirngs_helper.dart';
+import 'package:catsao/util/stirngs_helper.dart';
 
 /**
  * this page used to display some information about the error of loading, and lead to refresh.
